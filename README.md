@@ -270,10 +270,3 @@ If you use this code in your research, please cite the relevant papers:
 - **ESMFold Usage**: [ESM Documentation](https://github.com/facebookresearch/esm)
 - **Google Colab**: [Colab Documentation](https://colab.research.google.com/notebooks/intro.ipynb)
 
-## License
-
-[Add your license here]
-
-## Contact
-
-[Add contact information here]
