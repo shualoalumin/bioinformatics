@@ -41,9 +41,10 @@ bioinformatics/
     │   │   ├── metrics.py                # success_rate(), avg_pairwise_hamming()
     │   │   └── figures.py                # plot_round_curves() for visualization
     │   │
-    │   └── models/                        # Surrogate models
+    │   └── models/                        # Surrogate models (ESM2-based active learning)
     │       ├── __init__.py
-    │       └── surrogate.py              # ESM2 embeddings, MLP training, prediction
+    │       └── surrogate.py              # ESM2 embeddings extraction, MLP training,
+    │                                      # SurrogateConfig, get_embeddings(), train_surrogate()
     │
     ├── colab/                             # Google Colab notebooks (sequential workflow)
     │   ├── 01_scaffold_preprocess.ipynb   # Download and preprocess PDB scaffolds
