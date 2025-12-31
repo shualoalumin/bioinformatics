@@ -6,23 +6,79 @@ This repository contains computational biology and bioinformatics research proje
 
 ```
 bioinformatics/
-├── README.md                              # This file
-├── bootstrap_closed_loop_enzyme_bench.py  # Bootstrap script for enzyme benchmark
-└── closed_loop_enzyme_bench/             # Main project: Closed-loop enzyme design
-    ├── README.md                          # Project-specific documentation
-    ├── requirements.txt                   # Python dependencies
-    ├── src/                               # Core source code
+├── README.md                              # Repository overview and structure
+├── bootstrap_closed_loop_enzyme_bench.py # Bootstrap script to generate project structure
+│
+└── closed_loop_enzyme_bench/             # Main project: Closed-loop enzyme design benchmark
+    │
+    ├── README.md                          # Project documentation and quick start
+    ├── requirements.txt                   # Python package dependencies
+    ├── .gitignore                         # Git ignore patterns
+    │
+    ├── src/                                # Core source code modules
+    │   ├── __init__.py                    # Package initialization
+    │   │
     │   ├── data/                          # Data loading and preprocessing
-    │   ├── generate/                      # Sequence generation (ProteinMPNN, mutations)
-    │   ├── evaluate/                      # Structure evaluation (ESMFold)
-    │   ├── loop/                          # Closed-loop optimization algorithms
-    │   ├── metrics/                       # Metrics calculation and visualization
-    │   └── models/                        # Surrogate models (ESM2-based)
-    ├── colab/                             # Google Colab notebooks (5 experiments)
-    ├── configs/                           # Configuration files (YAML)
-    ├── docs/                              # Documentation and methods notes
-    ├── run_experiment_*.py                # Experiment execution scripts
-    └── *.md                               # Additional guides and documentation
+    │   │   ├── __init__.py
+    │   │   └── scaffolds.py              # PDB download, chain extraction, Scaffold dataclass
+    │   │
+    │   ├── generate/                      # Sequence generation
+    │   │   ├── __init__.py
+    │   │   ├── proteinmpnn.py            # ProteinMPNN wrapper and FASTA parsing
+    │   │   └── mutations.py              # Random mutation utilities (make_mutant_pool)
+    │   │
+    │   ├── evaluate/                      # Structure evaluation
+    │   │   ├── __init__.py
+    │   │   ├── esmfold_eval.py           # ESMFold model loading, folding, pLDDT scoring
+    │   │   └── pdb_utils.py             # PDB format conversion utilities
+    │   │
+    │   ├── loop/                          # Closed-loop optimization
+    │   │   ├── __init__.py
+    │   │   └── closed_loop.py           # Candidate dataclass, run_closed_loop() algorithm
+    │   │
+    │   ├── metrics/                       # Metrics and visualization
+    │   │   ├── __init__.py
+    │   │   ├── metrics.py                # success_rate(), avg_pairwise_hamming()
+    │   │   └── figures.py                # plot_round_curves() for visualization
+    │   │
+    │   └── models/                        # Surrogate models
+    │       ├── __init__.py
+    │       └── surrogate.py              # ESM2 embeddings, MLP training, prediction
+    │
+    ├── colab/                             # Google Colab notebooks (sequential workflow)
+    │   ├── 01_scaffold_preprocess.ipynb   # Download and preprocess PDB scaffolds
+    │   ├── 02_single_shot_esmf.ipynb      # Single-shot baseline (ProteinMPNN → ESMFold)
+    │   ├── 03_closed_loop_esmf.ipynb      # Closed-loop optimization (4 rounds)
+    │   ├── 04_surrogate_active_learning.ipynb  # Surrogate-guided active learning
+    │   └── 05_figures_tables.ipynb        # Results analysis and visualization
+    │
+    ├── configs/                           # Configuration files
+    │   └── example.yaml                   # Experiment configuration template
+    │
+    ├── docs/                              # Documentation
+    │   └── methods_note_template.md       # Methods documentation template (2-4 pages)
+    │
+    ├── run_experiment_01.py              # Experiment 01: Scaffold fetch & preprocess
+    ├── run_experiment_02.py              # Experiment 02: Single-shot baseline
+    ├── run_experiment_03.py              # Experiment 03: Closed-loop optimization
+    ├── quick_test_02.py                  # Quick test for Experiment 02 (no ProteinMPNN)
+    ├── run_all_experiments_colab.py      # Complete experiment runner for Colab
+    ├── start_experiment.py                # Main experiment runner (starts from Exp 01)
+    ├── check_environment.py              # Environment and dependency checker
+    ├── create_notebooks.py               # Script to regenerate Colab notebooks
+    │
+    ├── README.md                          # Project documentation
+    ├── SETUP.md                           # Detailed setup instructions
+    ├── QUICKSTART.md                      # Quick start guide
+    ├── COLAB_QUICKSTART.md                # Colab-specific quick start
+    ├── EXPERIMENT_02_GUIDE.md            # Single-shot experiment detailed guide
+    └── EXPERIMENT_03_GUIDE.md            # Closed-loop experiment detailed guide
+    │
+    └── results/                           # Generated results (gitignored)
+        ├── scaffolds/                     # Downloaded PDB files and sequences
+        ├── tables/                        # CSV files with experimental results
+        ├── figures/                       # PNG plots (round curves, comparisons)
+        └── pdb/                           # Predicted protein structures (PDB format)
 ```
 
 ## Main Project: Closed-loop Enzyme Design Benchmark
