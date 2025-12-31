@@ -1,0 +1,10 @@
+transformers>=4.35
+accelerate
+torch
+biopython
+pandas
+numpy
+matplotlib
+tqdm
+scikit-learn
+pyyaml

@@ -1,0 +1,27 @@
+scaffold:
+  pdb_id: "1AKL"
+  chain_id: "A"
+  max_len: 250
+
+generator:
+  mode: "proteinmpnn"
+  sampling_temp: 0.2
+  seed: 42
+
+closed_loop:
+  rounds: 4
+  per_round: 50
+  top_k: 10
+  mutate_rate: 0.03
+  diversify_penalty: 0.2
+
+evaluator:
+  model_id: "facebook/esmfold_v1"
+  device: "cuda"
+
+surrogate:
+  enabled: true
+  esm2_model_id: "facebook/esm2_t12_35M_UR50D"
+  hidden_pool: "mean"
+  epochs: 8
+  lr: 1e-3
