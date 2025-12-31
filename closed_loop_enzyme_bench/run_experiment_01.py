@@ -21,7 +21,7 @@ def main():
     try:
         sc = load_scaffold(PDB_ID, CHAIN, OUT / "scaffolds")
         
-        print(f"\n✓ Successfully loaded scaffold!")
+        print(f"\n[OK] Successfully loaded scaffold!")
         print(f"  PDB ID: {sc.pdb_id}")
         print(f"  Chain: {sc.chain_id}")
         print(f"  PDB Path: {sc.pdb_path}")
@@ -34,12 +34,12 @@ def main():
         # Save sequence to file for reference
         seq_file = OUT / "scaffolds" / f"{PDB_ID}_{CHAIN}_sequence.txt"
         seq_file.write_text(sc.sequence)
-        print(f"\n✓ Sequence saved to: {seq_file}")
+        print(f"\n[OK] Sequence saved to: {seq_file}")
         
         return sc
         
     except Exception as e:
-        print(f"\n✗ Error: {e}")
+        print(f"\n[ERROR] Error: {e}")
         import traceback
         traceback.print_exc()
         return None
