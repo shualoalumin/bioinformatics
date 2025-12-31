@@ -209,11 +209,66 @@ This benchmark addresses:
 - **Efficiency**: Surrogate models to reduce computational cost
 - **Accessibility**: Colab-ready notebooks for easy experimentation
 
-## Citation
+## References and Citations
+
+### Core Methods
 
 If you use this code in your research, please cite the relevant papers:
-- ProteinMPNN: [Dauparas et al., 2022](https://www.science.org/doi/10.1126/science.add2187)
-- ESMFold: [Lin et al., 2022](https://www.science.org/doi/10.1126/science.ade2574)
+
+#### ProteinMPNN
+- **Paper**: [Dauparas et al., 2022](https://www.science.org/doi/10.1126/science.add2187) - "Robust deep learning–based protein sequence design using ProteinMPNN"
+- **GitHub**: [dauparas/ProteinMPNN](https://github.com/dauparas/ProteinMPNN)
+- **DOI**: 10.1126/science.add2187
+
+#### ESMFold
+- **Paper**: [Lin et al., 2022](https://www.science.org/doi/10.1126/science.ade2574) - "Evolutionary-scale prediction of atomic-level protein structure with a language model"
+- **GitHub**: [facebookresearch/esm](https://github.com/facebookresearch/esm)
+- **Hugging Face**: [facebook/esmfold_v1](https://huggingface.co/facebook/esmfold_v1)
+- **DOI**: 10.1126/science.ade2574
+
+#### ESM2 (for Surrogate Models)
+- **Paper**: [Rives et al., 2021](https://www.pnas.org/doi/10.1073/pnas.2016239118) - "Biological structure and function emerge from scaling unsupervised learning to 250 million protein sequences"
+- **GitHub**: [facebookresearch/esm](https://github.com/facebookresearch/esm)
+- **Hugging Face**: [facebook/esm2_t12_35M_UR50D](https://huggingface.co/facebook/esm2_t12_35M_UR50D)
+- **DOI**: 10.1073/pnas.2016239118
+
+### Related Methods
+
+#### AlphaFold2
+- **Paper**: [Jumper et al., 2021](https://www.nature.com/articles/s41586-021-03819-2) - "Highly accurate protein structure prediction with AlphaFold"
+- **GitHub**: [deepmind/alphafold](https://github.com/deepmind/alphafold)
+- **DOI**: 10.1038/s41586-021-03819-2
+
+#### ColabFold
+- **Paper**: [Mirdita et al., 2022](https://www.nature.com/articles/s41592-022-01488-1) - "ColabFold: making protein folding accessible to all"
+- **GitHub**: [sokrypton/ColabFold](https://github.com/sokrypton/ColabFold)
+- **DOI**: 10.1038/s41592-022-01488-1
+
+### Additional Resources
+
+#### Protein Design and Engineering
+- **Protein Design Review**: [Huang et al., 2016](https://www.nature.com/articles/nature19946) - "The coming of age of de novo protein design"
+- **Enzyme Engineering**: [Arnold, 2018](https://www.nature.com/articles/s41586-018-0174-3) - "Directed Evolution: Bringing New Chemistry to Life"
+
+#### Active Learning and Surrogate Models
+- **Active Learning Review**: [Settles, 2009](https://www.morganclaypool.com/doi/abs/10.2200/S00429ED1V01Y200906AIM006) - "Active Learning Literature Survey"
+- **Bayesian Optimization**: [Frazier, 2018](https://arxiv.org/abs/1807.02811) - "A Tutorial on Bayesian Optimization"
+
+#### Datasets and Benchmarks
+- **PDB (Protein Data Bank)**: [Berman et al., 2000](https://www.nucleicacidsresearch.org/article/10.1093/nar/28.1.235) - [rcsb.org](https://www.rcsb.org/)
+- **UniProt**: [UniProt Consortium, 2023](https://www.nucleicacidsresearch.org/article/10.1093/nar/gkac1052) - [uniprot.org](https://www.uniprot.org/)
+
+### Software and Tools
+
+- **PyTorch**: [Paszke et al., 2019](https://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library) - [pytorch.org](https://pytorch.org/)
+- **Transformers (Hugging Face)**: [Wolf et al., 2020](https://www.aclweb.org/anthology/2020.emnlp-demos.6/) - [huggingface.co](https://huggingface.co/)
+- **BioPython**: [Cock et al., 2009](https://bioinformatics.oxfordjournals.org/content/25/11/1422) - [biopython.org](https://biopython.org/)
+
+### Tutorials and Guides
+
+- **ProteinMPNN Tutorial**: [ProteinMPNN Documentation](https://github.com/dauparas/ProteinMPNN)
+- **ESMFold Usage**: [ESM Documentation](https://github.com/facebookresearch/esm)
+- **Google Colab**: [Colab Documentation](https://colab.research.google.com/notebooks/intro.ipynb)
 
 ## License
 
