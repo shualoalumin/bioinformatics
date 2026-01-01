@@ -1,53 +1,64 @@
 # Closed-loop Enzyme Design Benchmark (ProteinMPNN + ESMFold)
 
 Colab-friendly benchmark for **enzyme/protein redesign**:
-- Generator: ProteinMPNN
-- Evaluator: ESMFold (Transformers) `facebook/esmfold_v1`
-- Optional: Surrogate model (ESM2 embeddings -> predicted fold score)
+- **Generator**: ProteinMPNN
+- **Evaluator**: ESMFold (Transformers) `facebook/esmfold_v1`
+- **Optional**: Surrogate model (ESM2 embeddings -> predicted fold score)
 
-## Quick Start
+## Quick Start (Local, recommended setup)
 
-### 1. 환경 확인 및 설치
+This project supports a local workflow via a project-local virtual environment (**`.venv/`**).
+
+### 1) Create and use the virtual environment
+
 ```bash
-# 의존성 설치
-pip install -r requirements.txt
+# from closed_loop_enzyme_bench/
+python -m venv .venv
+```
 
-# 환경 확인
+On Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Then install dependencies:
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+### 2) Verify your environment
+
+```bash
 python check_environment.py
 ```
 
-### 2. 실험 시작
-```bash
-# 전체 실험 시작 (권장)
-python start_experiment.py
+### 3) Run experiments
 
-# 또는 개별 실험 실행
-python run_experiment_01.py  # Experiment 01: Scaffold
-python run_experiment_02.py   # Experiment 02: Single-shot (ProteinMPNN 필요)
-python quick_test_02.py       # Experiment 02 빠른 테스트 (ProteinMPNN 불필요)
-python run_experiment_03.py   # Experiment 03: Closed-loop optimization
+```bash
+# Experiment 01: Scaffold download + sequence extraction
+python run_experiment_01.py
+
+# Experiment 02: Single-shot baseline (uses ProteinMPNN if available; otherwise falls back)
+python run_experiment_02.py
+
+# Experiment 03: Closed-loop optimization
+python run_experiment_03.py
 ```
 
-**참고**: Experiment 02는 ProteinMPNN이 필요합니다. 
-- **Colab 사용 권장** (자동 설치): `colab/02_single_shot_esmf.ipynb`
-- 또는 빠른 테스트: `python quick_test_02.py` (랜덤 mutation 사용)
+## Quick Start (Colab)
 
-자세한 가이드는 `SETUP.md`를 참고하세요.
+1. Upload the repository to Google Drive or clone it in Colab.
+2. Run notebooks in `colab/` sequentially:
+   - `01_scaffold_preprocess.ipynb`
+   - `02_single_shot_esmf.ipynb`
+   - `03_closed_loop_esmf.ipynb`
+   - `04_surrogate_active_learning.ipynb`
+   - `05_figures_tables.ipynb`
 
-### Colab Setup
-1. Upload this repository to Google Drive or clone in Colab
-2. Run notebooks in `colab/` directory sequentially:
-   - `01_scaffold_preprocess.ipynb` - Download and preprocess PDB scaffolds
-   - `02_single_shot_esmf.ipynb` - Single-shot baseline experiment
-   - `03_closed_loop_esmf.ipynb` - Closed-loop optimization
-   - `04_surrogate_active_learning.ipynb` - Surrogate-guided active learning
-   - `05_figures_tables.ipynb` - Generate figures and summary tables
-
-### Generate Notebooks (if needed)
-If notebooks are missing, run:
-```bash
-python create_notebooks.py
-```
+See `COLAB_QUICKSTART.md` for a copy/paste setup snippet.
 
 ## Project Structure
 
@@ -56,41 +67,40 @@ closed_loop_enzyme_bench/
 ├── README.md
 ├── requirements.txt
 ├── configs/
-│   └── example.yaml          # Configuration template
+│   └── example.yaml
 ├── src/
-│   ├── data/                 # Scaffold fetching and parsing
-│   ├── generate/            # ProteinMPNN wrappers, mutations
-│   ├── evaluate/            # ESMFold evaluation
-│   ├── loop/                 # Closed-loop algorithms
-│   ├── models/               # Surrogate model training
-│   └── metrics/              # Metrics and plotting
-├── colab/                    # Colab notebooks
-└── docs/                     # Methods documentation
-
+│   ├── data/        # PDB download + chain sequence extraction
+│   ├── generate/    # ProteinMPNN wrapper + simple mutation baselines
+│   ├── evaluate/    # ESMFold evaluation + PDB writing
+│   ├── loop/        # Closed-loop algorithms
+│   ├── metrics/     # Metrics + plotting
+│   └── models/      # Surrogate model (ESM2 embeddings -> MLP)
+├── colab/           # Colab notebooks
+└── docs/            # Methods note template
 ```
 
 ## Outputs
-- `results/tables/*.csv` - Experimental results tables
-- `results/figures/*.png` - Visualization plots
-- `results/pdb/*.pdb` - Predicted protein structures
+
+- `results/tables/*.csv` - experiment tables
+- `results/figures/*.png` - plots
+- `results/pdb/*.pdb` - predicted structures
 
 ## Experiments
 
-1. **E1: Single-shot baseline** - Generate N sequences once, evaluate with ESMFold
-2. **E2: Closed-loop** - Iterative optimization (propose → fold → select → mutate)
-3. **E3: Surrogate-guided** - Use ESM2 embeddings to predict fold quality, reduce expensive ESMFold calls
+1. **Experiment 02 (Single-shot)**: Generate N sequences once, evaluate with ESMFold
+2. **Experiment 03 (Closed-loop)**: Iterative optimization (propose -> fold -> select -> mutate)
+3. **Experiment 04 (Surrogate-guided)**: Use ESM2 embeddings to reduce expensive ESMFold calls
 
 ## Metrics
 
-- **mean pLDDT**: Average confidence score across all residues
-- **success rate**: Fraction of sequences with pLDDT > 80
-- **diversity**: Pairwise Hamming distance between sequences
-- **best/mean improvement**: Comparison across rounds
+- **mean pLDDT**: average confidence across residues
+- **success rate**: fraction with mean pLDDT >= 80
+- **diversity**: average pairwise Hamming distance
+- **round curves**: best/mean pLDDT by round
 
 ## Requirements
 
-- Python 3.8+
-- PyTorch (with CUDA for GPU acceleration)
-- transformers >= 4.35
-- biopython, pandas, numpy, matplotlib
-- ProteinMPNN (cloned automatically in Colab)
+- Python 3.10+ recommended (works with newer Windows builds)
+- PyTorch (CPU works; CUDA recommended for speed)
+- transformers, biopython, numpy, matplotlib, scikit-learn
+- ProteinMPNN (clone from `https://github.com/dauparas/ProteinMPNN` or run in Colab)

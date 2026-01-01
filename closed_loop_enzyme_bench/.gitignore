@@ -4,3 +4,7 @@ __pycache__/
 results/
 .venv/
 .DS_Store
+
+# Local notebook runs / accidental clones inside the repo
+colab/ProteinMPNN/
+colab/results/

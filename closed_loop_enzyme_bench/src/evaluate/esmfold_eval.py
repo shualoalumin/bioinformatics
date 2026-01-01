@@ -55,7 +55,14 @@ def fold_sequence(tok, model, seq: str, out_pdb: Path) -> Tuple[float, Path]:
 def evaluate_batch(seqs: List[str], model_id: str, device: str, out_dir: Path, max_n: int|None=None) -> List[FoldResult]:
     tok, model=load_esmfold(model_id, device)
     out=[]
-    for i,s in enumerate(seqs[: (max_n or len(seqs))]):
-        score, pdb=fold_sequence(tok, model, s, out_dir/f"pred_{i:04d}.pdb")
-        out.append(FoldResult(s, score, pdb))
+    n = (max_n or len(seqs))
+    for i,s in enumerate(seqs[:n]):
+        try:
+            print(f"[ESMFold] Folding {i+1}/{n} (L={len(s)}) ...", flush=True)
+            score, pdb=fold_sequence(tok, model, s, out_dir/f"pred_{i:04d}.pdb")
+            print(f"[ESMFold] Done {i+1}/{n}: mean_pLDDT={score:.2f}", flush=True)
+            out.append(FoldResult(s, score, pdb))
+        except Exception as e:
+            print(f"[ESMFold][ERROR] Failed on {i+1}/{n}: {e}", flush=True)
+            continue
     return out

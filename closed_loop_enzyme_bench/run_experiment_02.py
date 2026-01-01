@@ -4,7 +4,6 @@ Experiment 02: Single-shot baseline (ProteinMPNN → ESMFold)
 Generate sequences with ProteinMPNN and evaluate with ESMFold.
 """
 from pathlib import Path
-import pandas as pd
 import sys
 
 def check_proteinmpnn():
@@ -64,43 +63,51 @@ def run_with_proteinmpnn():
     
     print(f"\n[Step 3] Evaluating with ESMFold...")
     print("  This will take several minutes (ESMFold is slow)...")
-    print("  Evaluating first 10 sequences (use max_n parameter to adjust)")
+    print("  Tip: on CPU, start with 1-3 sequences, then scale up.")
     
     try:
+        # Auto-scale eval count for CPU vs GPU
+        dev = "cuda" if __import__("torch").cuda.is_available() else "cpu"
+        n_eval = 10 if dev == "cuda" else 1
         fold_res = evaluate_batch(
-            seqs[:10],  # Start with 10 for testing
+            seqs[:max(1, n_eval)],
             model_id="facebook/esmfold_v1", 
-            device="cuda" if __import__("torch").cuda.is_available() else "cpu",
+            device=dev,
             out_dir=OUT / "pdb" / "single_shot",
-            max_n=10
+            max_n=n_eval
         )
         
-        df = pd.DataFrame([
-            {
-                "sequence": r.sequence,
-                "mean_plddt": r.mean_plddt,
-                "pdb": str(r.pdb_path)
-            } for r in fold_res
-        ])
-        
-        df_sorted = df.sort_values("mean_plddt", ascending=False)
+        rows = [
+            {"sequence": r.sequence, "mean_plddt": r.mean_plddt, "pdb": str(r.pdb_path)}
+            for r in fold_res
+        ]
+
+        if len(rows) == 0:
+            raise RuntimeError("No fold results were produced. See logs above (ESMFold failures).")
+
+        rows_sorted = sorted(rows, key=lambda x: x["mean_plddt"], reverse=True)
         
         print(f"\n[OK] Evaluation complete!")
         print(f"\nTop 5 sequences by pLDDT:")
-        print(df_sorted.head(5).to_string(index=False))
+        for r in rows_sorted[:5]:
+            print(f"  mean_pLDDT={r['mean_plddt']:.2f}  pdb={r['pdb']}")
         
         print(f"\nStatistics:")
-        print(f"  Best pLDDT: {df['mean_plddt'].max():.2f}")
-        print(f"  Mean pLDDT: {df['mean_plddt'].mean():.2f}")
-        print(f"  Min pLDDT: {df['mean_plddt'].min():.2f}")
+        scores = [r["mean_plddt"] for r in rows]
+        print(f"  Best pLDDT: {max(scores):.2f}")
+        print(f"  Mean pLDDT: {statistics.mean(scores):.2f}")
+        print(f"  Min pLDDT: {min(scores):.2f}")
         
         # Save results
         (OUT / "tables").mkdir(parents=True, exist_ok=True)
         csv_path = OUT / "tables" / "single_shot.csv"
-        df.to_csv(csv_path, index=False)
+        with csv_path.open("w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=["sequence", "mean_plddt", "pdb"])
+            w.writeheader()
+            w.writerows(rows)
         print(f"\n[OK] Results saved to: {csv_path}")
         
-        return df
+        return rows
         
     except Exception as e:
         print(f"[ERROR] ESMFold evaluation failed: {e}")
@@ -121,31 +128,39 @@ def run_with_mutations(scaffold):
     
     print(f"\n[Step 3] Evaluating with ESMFold...")
     try:
+        dev = "cuda" if __import__("torch").cuda.is_available() else "cpu"
+        n_eval = 10 if dev == "cuda" else 1
         fold_res = evaluate_batch(
-            seqs[:10],
+            seqs[:max(1, n_eval)],
             model_id="facebook/esmfold_v1",
-            device="cuda" if __import__("torch").cuda.is_available() else "cpu",
+            device=dev,
             out_dir=Path("results") / "pdb" / "single_shot",
-            max_n=10
+            max_n=n_eval
         )
         
-        df = pd.DataFrame([
+        rows = [
             {"sequence": r.sequence, "mean_plddt": r.mean_plddt, "pdb": str(r.pdb_path)}
             for r in fold_res
-        ])
-        
-        df_sorted = df.sort_values("mean_plddt", ascending=False)
+        ]
+
+        if len(rows) == 0:
+            raise RuntimeError("No fold results were produced. See logs above (ESMFold failures).")
+        rows_sorted = sorted(rows, key=lambda x: x["mean_plddt"], reverse=True)
         print(f"\n[OK] Evaluation complete!")
         print(f"\nTop 5 sequences:")
-        print(df_sorted.head(5).to_string(index=False))
+        for r in rows_sorted[:5]:
+            print(f"  mean_pLDDT={r['mean_plddt']:.2f}  pdb={r['pdb']}")
         
         OUT = Path("results")
         (OUT / "tables").mkdir(parents=True, exist_ok=True)
         csv_path = OUT / "tables" / "single_shot.csv"
-        df.to_csv(csv_path, index=False)
+        with csv_path.open("w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=["sequence", "mean_plddt", "pdb"])
+            w.writeheader()
+            w.writerows(rows)
         print(f"\n[OK] Results saved to: {csv_path}")
         
-        return df
+        return rows
         
     except Exception as e:
         print(f"[ERROR] Evaluation failed: {e}")

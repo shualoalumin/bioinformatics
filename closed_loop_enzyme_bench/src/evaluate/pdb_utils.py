@@ -15,12 +15,33 @@ def convert_outputs_to_pdb(outputs, sequence: str) -> str:
     if hasattr(pos, 'detach'):
         pos = pos.detach().cpu().numpy()
     
-    # Extract CA positions (assuming shape [batch, length, atoms, 3])
-    # For ESMFold, positions are typically [batch, length, atoms, 3] where atoms[1] is CA
-    if len(pos.shape) == 4:
+    # Extract CA positions
+    # ESMFold outputs can have different shapes depending on version:
+    # - (batch, length, atoms, 3) - older versions
+    # - (num_recycles, batch, length, atoms, 3) - newer versions with recycling
+    # CA atom is at index 1 in the atoms dimension
+    
+    if len(pos.shape) == 5:
+        # Shape: (num_recycles, batch, length, atoms, 3)
+        # Use the last recycling iteration
+        ca = pos[-1, 0, :, 1, :]  # [length, 3] - CA atoms from last iteration
+    elif len(pos.shape) == 4:
         ca = pos[0, :, 1, :]  # [length, 3] - CA atoms
     elif len(pos.shape) == 3:
-        ca = pos[0, :, :]  # [length, 3] - assume already CA
+        # Could be (batch, length, 3) OR (length, atoms, 3)
+        if pos.shape[-1] != 3:
+            raise ValueError(f"Unexpected positions shape: {pos.shape}")
+        if pos.shape[0] == 1 and pos.shape[2] == 3:
+            # (1, length, 3) -> already coordinates
+            ca = pos[0, :, :]
+        elif pos.shape[-2] in (14, 37):
+            # (length, atoms, 3) -> take CA at atom index 1
+            ca = pos[:, 1, :]
+        else:
+            # Fallback: assume first dim is batch
+            ca = pos[0, :, :]
+    elif len(pos.shape) == 2:
+        ca = pos  # Already [length, 3]
     else:
         raise ValueError(f"Unexpected positions shape: {pos.shape}")
     

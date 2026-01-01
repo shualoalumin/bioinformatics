@@ -26,6 +26,33 @@ import torch, platform
 print("torch", torch.__version__, "cuda?", torch.cuda.is_available(), "python", platform.python_version())
 """
 
+# New setup cell to fix sys.path for local src discovery
+SETUP_PATH = """import sys
+import os
+from pathlib import Path
+
+# Add project root to sys.path so we can import 'src'
+current_path = Path(os.getcwd()).resolve()
+project_root = None
+p = current_path
+for _ in range(5):
+    if (p / "src").exists() and (p / "src").is_dir():
+        project_root = p
+        break
+    p = p.parent
+
+if project_root and str(project_root) not in sys.path:
+    sys.path.append(str(project_root))
+    print(f"Added to sys.path: {project_root}")
+elif current_path.name == 'colab':
+    # Fallback for Colab default structure if cloning repo
+    # If we are in /content/repo/colab, parent is repo
+    parent = str(current_path.parent)
+    if parent not in sys.path:
+        sys.path.append(parent)
+        print(f"Added to sys.path: {parent}")
+"""
+
 CLONE_MPNN = """!git clone -q https://github.com/dauparas/ProteinMPNN.git
 !pip -q install -r ProteinMPNN/requirements.txt
 """
@@ -40,6 +67,7 @@ if __name__ == "__main__":
     nb1 = notebook([
         md_cell("# 01 — Scaffold fetch & preprocess"),
         code_cell(INSTALL),
+        code_cell(SETUP_PATH),
         code_cell("""from pathlib import Path
 from src.data.scaffolds import load_scaffold
 OUT = Path("results")
@@ -54,6 +82,7 @@ print(sc.sequence[:120] + "...")
     nb2 = notebook([
         md_cell("# 02 — Single-shot baseline (ProteinMPNN → ESMFold)"),
         code_cell(INSTALL),
+        code_cell(SETUP_PATH),
         code_cell(CLONE_MPNN),
         code_cell("""from pathlib import Path
 import pandas as pd
@@ -84,6 +113,7 @@ print("saved", OUT/"tables"/"single_shot.csv")
     nb3 = notebook([
         md_cell("# 03 — Closed-loop (propose → fold → select → mutate)"),
         code_cell(INSTALL),
+        code_cell(SETUP_PATH),
         code_cell(CLONE_MPNN),
         code_cell("""from pathlib import Path
 from src.data.scaffolds import load_scaffold
@@ -125,6 +155,7 @@ print("saved tables/figures in", OUT)
     nb4 = notebook([
         md_cell("# 04 — Surrogate-guided closed-loop (DL / active learning)"),
         code_cell(INSTALL),
+        code_cell(SETUP_PATH),
         code_cell(CLONE_MPNN),
         code_cell("""from pathlib import Path
 import pandas as pd
@@ -173,6 +204,7 @@ print("saved", OUT/"tables"/"surrogate_guided.csv")
     nb5 = notebook([
         md_cell("# 05 — Figures & tables"),
         code_cell(INSTALL),
+        code_cell(SETUP_PATH),
         code_cell("""from pathlib import Path
 import pandas as pd
 from src.metrics.figures import plot_round_curves
