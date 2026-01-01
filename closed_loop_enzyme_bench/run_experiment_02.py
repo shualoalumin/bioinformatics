@@ -5,6 +5,7 @@ Generate sequences with ProteinMPNN and evaluate with ESMFold.
 """
 from pathlib import Path
 import sys
+import pandas as pd
 
 def check_proteinmpnn():
     """Check if ProteinMPNN is available."""
@@ -85,26 +86,24 @@ def run_with_proteinmpnn():
         if len(rows) == 0:
             raise RuntimeError("No fold results were produced. See logs above (ESMFold failures).")
 
-        rows_sorted = sorted(rows, key=lambda x: x["mean_plddt"], reverse=True)
+        # Convert to DataFrame for easier handling
+        df = pd.DataFrame(rows)
+        df_sorted = df.sort_values("mean_plddt", ascending=False)
         
         print(f"\n[OK] Evaluation complete!")
         print(f"\nTop 5 sequences by pLDDT:")
-        for r in rows_sorted[:5]:
+        for _, r in df_sorted.head(5).iterrows():
             print(f"  mean_pLDDT={r['mean_plddt']:.2f}  pdb={r['pdb']}")
         
         print(f"\nStatistics:")
-        scores = [r["mean_plddt"] for r in rows]
-        print(f"  Best pLDDT: {max(scores):.2f}")
-        print(f"  Mean pLDDT: {statistics.mean(scores):.2f}")
-        print(f"  Min pLDDT: {min(scores):.2f}")
+        print(f"  Best pLDDT: {df['mean_plddt'].max():.2f}")
+        print(f"  Mean pLDDT: {df['mean_plddt'].mean():.2f}")
+        print(f"  Min pLDDT: {df['mean_plddt'].min():.2f}")
         
         # Save results
         (OUT / "tables").mkdir(parents=True, exist_ok=True)
         csv_path = OUT / "tables" / "single_shot.csv"
-        with csv_path.open("w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=["sequence", "mean_plddt", "pdb"])
-            w.writeheader()
-            w.writerows(rows)
+        df.to_csv(csv_path, index=False)
         print(f"\n[OK] Results saved to: {csv_path}")
         
         return rows
@@ -145,19 +144,20 @@ def run_with_mutations(scaffold):
 
         if len(rows) == 0:
             raise RuntimeError("No fold results were produced. See logs above (ESMFold failures).")
-        rows_sorted = sorted(rows, key=lambda x: x["mean_plddt"], reverse=True)
+        
+        # Convert to DataFrame for easier handling
+        df = pd.DataFrame(rows)
+        df_sorted = df.sort_values("mean_plddt", ascending=False)
+        
         print(f"\n[OK] Evaluation complete!")
         print(f"\nTop 5 sequences:")
-        for r in rows_sorted[:5]:
+        for _, r in df_sorted.head(5).iterrows():
             print(f"  mean_pLDDT={r['mean_plddt']:.2f}  pdb={r['pdb']}")
         
         OUT = Path("results")
         (OUT / "tables").mkdir(parents=True, exist_ok=True)
         csv_path = OUT / "tables" / "single_shot.csv"
-        with csv_path.open("w", newline="", encoding="utf-8") as f:
-            w = csv.DictWriter(f, fieldnames=["sequence", "mean_plddt", "pdb"])
-            w.writeheader()
-            w.writerows(rows)
+        df.to_csv(csv_path, index=False)
         print(f"\n[OK] Results saved to: {csv_path}")
         
         return rows

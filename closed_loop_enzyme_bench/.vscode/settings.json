@@ -1,10 +1,15 @@
 {
   // Use the project-local virtual environment so imports resolve consistently
-  "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
   "python.terminal.activateEnvironment": true,
 
   // Make `import src...` work in editors/linters
-  "python.analysis.extraPaths": ["${workspaceFolder}"],
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}",
+    "${workspaceFolder}/.venv/Lib/site-packages"
+  ],
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.diagnosticMode": "workspace",
 
   // Avoid noisy type checking for research scripts
   "python.analysis.typeCheckingMode": "basic"
