@@ -1,0 +1,20 @@
+{
+  "include": [
+    "src",
+    "*.py"
+  ],
+  "exclude": [
+    "**/colab/**",
+    "**/node_modules",
+    "**/__pycache__"
+  ],
+  "venvPath": ".",
+  "venv": ".venv",
+  "pythonVersion": "3.14",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": "none",
+  "reportMissingTypeStubs": false,
+  "extraPaths": [
+    ".venv/Lib/site-packages"
+  ]
+}

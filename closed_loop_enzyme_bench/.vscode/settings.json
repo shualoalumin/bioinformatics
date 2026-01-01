@@ -12,6 +12,20 @@
   "python.analysis.diagnosticMode": "workspace",
 
   // Avoid noisy type checking for research scripts
-  "python.analysis.typeCheckingMode": "basic"
+  "python.analysis.typeCheckingMode": "basic",
+  
+  // Exclude Colab notebooks from linting (they run in Colab, not locally)
+  "files.exclude": {
+    "**/colab/**/*.ipynb": false
+  },
+  
+  // Disable linting for Jupyter notebooks in colab directory
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python"
+  },
+  "files.associations": {
+    "**/colab/**/*.ipynb": "jupyter-notebook"
+  },
+  "jupyter.notebookFileRoot": "${workspaceFolder}"
 }
 

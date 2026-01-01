@@ -1,9 +1,24 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-results/
 .venv/
 .DS_Store
+
+# Results directory (selective commit)
+# Allow CSV and PNG files, but ignore large files
+results/
+!results/tables/
+!results/figures/
+results/tables/*
+!results/tables/*.csv
+results/figures/*
+!results/figures/*.png
+
+# Large files (always ignore)
+results/pdb/
+results/scaffolds/
+results/mpnn_single/
+results/mpnn_round*/
 
 # Local notebook runs / accidental clones inside the repo
 colab/ProteinMPNN/

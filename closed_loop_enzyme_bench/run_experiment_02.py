@@ -5,7 +5,7 @@ Generate sequences with ProteinMPNN and evaluate with ESMFold.
 """
 from pathlib import Path
 import sys
-import pandas as pd
+import pandas as pd  # pyright: ignore[reportMissingImports]
 
 def check_proteinmpnn():
     """Check if ProteinMPNN is available."""
